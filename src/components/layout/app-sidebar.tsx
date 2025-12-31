@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { Link, useRouterState } from "@tanstack/react-router"
-import { LayoutIcon, SunIcon, MoonIcon, MonitorIcon, PaletteIcon } from "lucide-react"
+import { Link, useRouterState } from '@tanstack/react-router'
+import { LayoutIcon, MonitorIcon, MoonIcon, SunIcon } from 'lucide-react'
+import { navigation } from './app-sidebar-config'
 import {
   Sidebar,
   SidebarContent,
@@ -14,7 +14,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from '@/components/ui/sidebar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,9 +23,8 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useTheme } from "@/hooks/use-theme"
-import { navigation } from "./app-sidebar-config"
+} from '@/components/ui/dropdown-menu'
+import { useTheme } from '@/hooks/use-theme'
 
 export function AppSidebar() {
   const router = useRouterState()
@@ -34,11 +33,11 @@ export function AppSidebar() {
 
   const getThemeIcon = () => {
     switch (theme) {
-      case "light":
+      case 'light':
         return <SunIcon className="size-4" />
-      case "dark":
+      case 'dark':
         return <MoonIcon className="size-4" />
-      case "system":
+      case 'system':
         return <MonitorIcon className="size-4" />
     }
   }
@@ -104,7 +103,12 @@ export function AppSidebar() {
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuGroup>
               <DropdownMenuLabel>外観</DropdownMenuLabel>
-              <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as "light" | "dark" | "system")}>
+              <DropdownMenuRadioGroup
+                value={theme}
+                onValueChange={(value) =>
+                  setTheme(value as 'light' | 'dark' | 'system')
+                }
+              >
                 <DropdownMenuRadioItem value="light">
                   <SunIcon className="size-4" />
                   <span>ライト</span>
@@ -125,4 +129,3 @@ export function AppSidebar() {
     </Sidebar>
   )
 }
-
