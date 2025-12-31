@@ -1,0 +1,231 @@
+---
+alwaysApply: true
+---
+
+TypeScript、Node.js、bun、Tanstack Start、React、Shadcn UI、Radix UI、Tailwind CSS、Supabase、Tanstack Router、React Hook Form、Zodのエキスパート。
+Always respond in 日本語
+
+# 一般的な好み
+
+- ユーザーの要求に注意深く、忠実に従うこと。
+- 常に正しく、最新で、バグがなく、完全に機能し、動作し、安全で、パフォーマンスが高く、効率的なコードを書くこと。
+- パフォーマンスよりも読みやすさを重視すること。
+- 要求されたすべての機能を完全に実装すること。
+- Todo、プレースホルダー、コードに欠けている部分を残さないでください。
+- 必ずファイル名を参照すること。
+- 簡潔に。その他の散文は最小限にすること。
+- 正しい答えがないと思ったら、そう言うこと。答えがわからない場合は、推測ではなくそう言うこと。
+- ユーザーの意見に誤りがあれば正しく指摘すること。
+
+# 主要な原則
+
+- 正確な TypeScript の例を用いて、簡潔で技術的な回答を書くこと。
+- 関数的で宣言的なプログラミングを使用する。クラスは避ける。
+- 重複よりも反復とモジュール化を優先する。
+- 補助動詞（isLoadingなど）を用いた説明的な変数名を使用する。
+- ディレクトリにはダッシュ付きの小文字を使う（例：components/auth-wizard）。
+- コンポーネントには名前付きエクスポートを使用する。
+- Receive an Object, Return an Object (RORO) パターンを使用する。
+- データフェッチとキャッシュにはTanstack Queryを使用する。
+
+# TypeScriptの使用法
+
+- すべてのコードにTypeScriptを使用する。
+- 列挙型は避け、代わりにマップを使う。
+
+# TanStack Queryのベストプラクティス（2025年時点）
+
+TanStack Queryは、データフェッチ、キャッシュ、同期を効率的に管理するライブラリです。以下のベストプラクティスは、公式ドキュメント、Tanner Linsley氏のポスト（2024年6月/7月、2025年）、Reddit（r/reactjs、r/nextjs）、Xのコミュニティに基づきます。Next.js（App Router）やPrismaとの統合、useSuspenseQueryのストリーミング・ハイドレーションを重視。
+
+## 1. クエリキーの構造化と型安全
+
+クエリキーを配列形式で一貫させ、依存（例: ID、フィルタ）を明示。型安全なファクトリで再利用し、invalidateQueriesを効率化。
+
+- キー: `['resource', id, { filter: 'active' }]` のように階層化。
+- ファクトリ: 再利用可能な関数で生成。
+- 依存変更時: 自動再フェッチ。
+
+```tsx
+// utils/query-keys.ts
+export const queryKeys = {
+  posts: (id: string, filter: string) => ['posts', id, { filter }] as const,
+}
+
+// 使用例
+const { data } = useQuery({
+  queryKey: queryKeys.posts('1', 'active'),
+  queryFn: () =>
+    fetch(`/posts/${id}?filter=${filter}`).then((res) => res.json()),
+})
+```
+
+## 2. キャッシュ戦略と制御
+
+staleTime/cacheTimeでキャッシュ寿命を調整。デフォルトをQueryClientで設定し、即時再フェッチを制御。サーバー初期フェッチを優先。
+
+- staleTime: 0（即再フェッチ）またはInfinity（無期限）。
+- cacheTime: 5分以上（GC遅延）。
+- グローバル設定: ブラウザ/サーバー分離。
+- デデュープ: 同一キークエリを1つに。
+
+```tsx
+// app/providers.tsx
+'use client'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { staleTime: 60 * 1000, cacheTime: 5 * 60 * 1000 },
+  },
+})
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  )
+}
+```
+
+## 3. useSuspenseQueryとストリーミング・ハイドレーション
+
+Server ComponentsでprefetchQueryし、HydrationBoundaryでクライアントに渡す。サーバー/クライアント同期をシームレスに。PrismaをqueryFnにラップ。
+
+- サーバー: prefetch/dehydrate。
+- クライアント: useSuspenseQueryでSuspense管理。
+- ストリーミング: shouldDehydrateQueryでpendingを含む。
+- ハイドレーション: サーバー/クライアントキー一致。
+
+```tsx
+// Server: app/posts/page.tsx
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from '@tanstack/react-query'
+
+export default async function PostsPage() {
+  const queryClient = new QueryClient()
+  await queryClient.prefetchQuery({ queryKey: ['posts'], queryFn: getPosts })
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <Posts />
+    </HydrationBoundary>
+  )
+}
+
+// Client: app/posts/posts.tsx
+;('use client')
+import { useSuspenseQuery } from '@tanstack/react-query'
+
+export default function Posts() {
+  const { data } = useSuspenseQuery({ queryKey: ['posts'], queryFn: getPosts })
+  return (
+    <ul>
+      {data.map((post) => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  )
+}
+```
+
+## 4. Mutationsと楽観的更新
+
+useMutationで更新を扱い、onMutateでUI仮更新、onSuccessでinvalidateQueries。ロールバックをonErrorで実装。
+
+- onMutate: 仮データセット。
+- onError: ロールバック。
+- onSuccess: 無効化/再フェッチ。
+- Server Actions統合: Next.jsでmutate呼び出し。
+
+```tsx
+const mutation = useMutation({
+  mutationFn: updatePost,
+  onMutate: async (newPost) => {
+    await queryClient.cancelQueries({ queryKey: ['posts'] })
+    const previous = queryClient.getQueryData(['posts'])
+    queryClient.setQueryData(['posts'], (old: Post[]) => [...old, newPost])
+    return { previous }
+  },
+  onError: (_, __, context) =>
+    queryClient.setQueryData(['posts'], context?.previous),
+  onSuccess: () => queryClient.invalidateQueries({ queryKey: ['posts'] }),
+})
+```
+
+## 5. エラーハンドリング
+
+useErrorBoundaryで境界を設定、Suspenseでフォールバック。グローバルにdefaultOptionsでthrowOnErrorを設定し、エラー状態を宣言的に管理。
+
+- throwOnError: trueでSuspense投げ。
+- isError: UIでエラー表示。
+- DevTools: エラーシミュレート。
+
+```tsx
+const { data, error, isError } = useQuery({
+  queryKey: ['data'],
+  queryFn: fetchData,
+  throwOnError: true,
+})
+if (isError) return <div>Error: {error.message}</div>
+```
+
+## 6. DevToolsの活用
+
+開発時にReactQueryDevtoolsを追加し、クエリ監視、リトライ、無効化を行う。キャッシュ状態を可視化し、デバッグを効率化。
+
+- Providerに追加。
+- クエリ再実行/エラーシミュレート。
+- キャッシュダンプ。
+
+```tsx
+// app/providers.tsx
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+
+// ...
+;<QueryClientProvider client={queryClient}>
+  <ReactQueryDevtools initialIsOpen={false} />
+  {children}
+</QueryClientProvider>
+```
+
+# エラー処理と検証
+
+- エラー処理はTanStackのベストプラクティスに従う
+- エラー処理とエッジケースに優先順位をつける：
+  - エラーとエッジケースは関数の先頭で処理する。
+  - if文が深くネストするのを避けるため、エラー条件にはアーリーリターンを使用する。
+  - 読みやすくするために、ハッピーパスを関数の最後に置く。
+  - 不必要なelse文は避け、代わりにif-returnパターンを使用する。
+  - ガード句を使用して、前提条件や無効な状態を早期に処理する。
+  - 適切なエラーログとユーザーフレンドリーなエラーメッセージを実装する。
+  - 一貫したエラー処理を行うために、カスタムエラータイプやエラーファクトリの使用を検討する。
+
+# 構文と書式
+
+- 純粋な関数には 「function」キーワードを使用する。
+- 単純なステートメントには簡潔な構文を使用する。
+- 宣言的なJSXを使用する。
+
+# UIとスタイリング
+
+- コンポーネントとスタイリングには、Shadcn UI(Radix)、Tailwindを使用。
+- Tailwind CSSでレスポンシブデザインを実装し、モバイルファーストアプローチを使用します。
+- Tailwind CSSでレスポンシブデザインを実装する。
+- レスポンシブデザインには、モバイルファーストアプローチを使用する。
+
+# Supabase
+
+- Supabaseクライアントをデータベースとのやり取りやリアルタイムのサブスクリプションに使用する。
+- きめ細かなアクセス制御のためにRow Level Security (RLS)ポリシーを実装します。
+- Supabase Authを使用したユーザー認証と管理。
+- Supabase Storageを利用してファイルのアップロードと管理を行います。
+- Supabase RLSとポリシーを使用して、適切な認証と認可を実装する。
+- Supabase Cliを使用して、コードベースでmigrationを管理する。
+
+# 主な規約
+
+- URL検索パラメータの状態管理には'nuqs'を使用する。
+- ウェブ・バイタル（LCP、CLS、FID）を優先する。
+- フォームのバリデーションを実装する（クライアントサイドとサーバーサイド）。
+- フォーム検証にはZodを使用する。
