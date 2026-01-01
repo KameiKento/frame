@@ -1,5 +1,3 @@
-'use client'
-
 import { Link, useRouterState } from '@tanstack/react-router'
 import { LayoutIcon, MonitorIcon, MoonIcon, SunIcon } from 'lucide-react'
 import { navigation } from './app-sidebar-config'

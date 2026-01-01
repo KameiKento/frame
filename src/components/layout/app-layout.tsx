@@ -1,12 +1,10 @@
-"use client"
-
-import * as React from "react"
+import * as React from 'react'
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { AppSidebar } from "./app-sidebar"
+} from '@/components/ui/sidebar'
+import { AppSidebar } from './app-sidebar'
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -22,4 +20,3 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     </SidebarProvider>
   )
 }
-

@@ -22,6 +22,7 @@
 デプロイが完了したら、実際のURLを取得して`registry.json`の`homepage`フィールドを更新してください。
 
 例：
+
 ```json
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
@@ -89,4 +90,3 @@ npx shadcn@latest add https://your-domain.com/r/button.json
 
 - `registry.json`の`homepage`フィールドが正しいURLになっているか確認
 - 各registry-item.jsonファイルのパスが正しいか確認
-
