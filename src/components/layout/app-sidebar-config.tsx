@@ -1,20 +1,21 @@
-import type { LucideIcon } from "lucide-react"
 import {
-  HomeIcon,
-  LayoutIcon,
-  BookOpenIcon,
-  DownloadIcon,
   AlertCircleIcon,
-  TagIcon,
-  MousePointerIcon,
+  BookOpenIcon,
   CreditCardIcon,
-  SearchIcon,
-  MenuIcon,
+  DownloadIcon,
   FileTextIcon,
-  TypeIcon,
+  HomeIcon,
+  ImageIcon,
+  LayoutIcon,
   ListIcon,
+  MenuIcon,
   MinusIcon,
-} from "lucide-react"
+  MousePointerIcon,
+  SearchIcon,
+  TagIcon,
+  TypeIcon,
+} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 export type NavItem = {
   title: string
@@ -25,99 +26,103 @@ export type NavItem = {
 
 export type NavGroup = {
   title: string
-  items: NavItem[]
+  items: Array<NavItem>
 }
 
-export const navigation: NavGroup[] = [
+export const navigation: Array<NavGroup> = [
   {
-    title: "ホーム",
+    title: 'ホーム',
     items: [
       {
-        title: "概要",
-        url: "/",
+        title: '概要',
+        url: '/',
         icon: HomeIcon,
       },
     ],
   },
   {
-    title: "コンポーネント",
+    title: 'コンポーネント',
     items: [
       {
-        title: "AlertDialog",
-        url: "/components/alert-dialog",
+        title: 'AlertDialog',
+        url: '/components/alert-dialog',
         icon: AlertCircleIcon,
       },
       {
-        title: "Badge",
-        url: "/components/badge",
+        title: 'Badge',
+        url: '/components/badge',
         icon: TagIcon,
       },
       {
-        title: "Button",
-        url: "/components/button",
+        title: 'Button',
+        url: '/components/button',
         icon: MousePointerIcon,
       },
       {
-        title: "Card",
-        url: "/components/card",
+        title: 'Card',
+        url: '/components/card',
         icon: CreditCardIcon,
       },
       {
-        title: "Combobox",
-        url: "/components/combobox",
+        title: 'Combobox',
+        url: '/components/combobox',
         icon: SearchIcon,
       },
       {
-        title: "DropdownMenu",
-        url: "/components/dropdown-menu",
+        title: 'DropdownMenu',
+        url: '/components/dropdown-menu',
         icon: MenuIcon,
       },
       {
-        title: "Field",
-        url: "/components/field",
+        title: 'Field',
+        url: '/components/field',
         icon: FileTextIcon,
       },
       {
-        title: "Input",
-        url: "/components/input",
+        title: 'ImageUploader',
+        url: '/components/image-uploader',
+        icon: ImageIcon,
+      },
+      {
+        title: 'Input',
+        url: '/components/input',
         icon: TypeIcon,
       },
       {
-        title: "Label",
-        url: "/components/label",
+        title: 'Label',
+        url: '/components/label',
         icon: FileTextIcon,
       },
       {
-        title: "Select",
-        url: "/components/select",
+        title: 'Select',
+        url: '/components/select',
         icon: ListIcon,
       },
       {
-        title: "Separator",
-        url: "/components/separator",
+        title: 'Separator',
+        url: '/components/separator',
         icon: MinusIcon,
       },
       {
-        title: "Textarea",
-        url: "/components/textarea",
+        title: 'Textarea',
+        url: '/components/textarea',
         icon: FileTextIcon,
       },
     ],
   },
   {
-    title: "ドキュメント",
+    title: 'ドキュメント',
     items: [
       {
-        title: "はじめに",
-        url: "/docs/getting-started",
+        title: 'はじめに',
+        url: '/docs/getting-started',
         icon: BookOpenIcon,
       },
       {
-        title: "インストール",
-        url: "/docs/installation",
+        title: 'インストール',
+        url: '/docs/installation',
         icon: DownloadIcon,
       },
     ],
   },
 ]
-
