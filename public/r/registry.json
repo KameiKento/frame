@@ -19,6 +19,39 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "image-uploader",
+      "type": "registry:ui",
+      "title": "ImageUploader",
+      "description": "ドラッグ&ドロップまたはクリックで複数の画像をアップロードできるコンポーネント。事前バリデーション、プレビュー表示、並び替え、進捗表示などの機能を提供します。",
+      "registryDependencies": ["button", "badge"],
+      "files": [
+        {
+          "path": "src/components/image-uploader/types.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/image-uploader/validation.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/image-uploader/utils.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/image-uploader/drop-zone.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/image-uploader/image-preview.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/image-uploader/image-uploader.tsx",
+          "type": "registry:component"
+        }
+      ]
     }
   ]
 }
