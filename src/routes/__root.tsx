@@ -7,26 +7,36 @@ import appCss from '../styles.css?url'
 import { AppLayout } from '@/components/layout/app-layout'
 
 export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      {
-        charSet: 'utf-8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title: 'Frame',
-      },
-    ],
-    links: [
-      {
-        rel: 'stylesheet',
-        href: appCss,
-      },
-    ],
-  }),
+  head: () => {
+    const isDev = import.meta.env.DEV
+    const title = isDev ? '【dev】Frame' : 'Frame'
+    const favicon = isDev ? '/favicon-dev.ico' : '/favicon.ico'
+
+    return {
+      meta: [
+        {
+          charSet: 'utf-8',
+        },
+        {
+          name: 'viewport',
+          content: 'width=device-width, initial-scale=1',
+        },
+        {
+          title,
+        },
+      ],
+      links: [
+        {
+          rel: 'stylesheet',
+          href: appCss,
+        },
+        {
+          rel: 'icon',
+          href: favicon,
+        },
+      ],
+    }
+  },
 
   shellComponent: RootDocument,
 })
