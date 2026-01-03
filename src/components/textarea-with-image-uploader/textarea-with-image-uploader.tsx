@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { ImageIcon } from 'lucide-react'
+import { ImageIcon, Send } from 'lucide-react'
+import { toast } from 'sonner'
 import type {
   ImageFile,
   ImageUploaderConfig,
@@ -11,6 +12,7 @@ import { ImagePreview } from '@/components/image-uploader/image-preview'
 import {
   cleanupImageFiles,
   createPreviewUrl,
+  formatFileSize,
   generateImageId,
   mockUploadImage,
   revokePreviewUrl,
@@ -298,24 +300,83 @@ export function TextareaWithImageUploader({
     [onChange, maxLength],
   )
 
+  const handleSubmit = React.useCallback(() => {
+    const uploadedImages = images.filter((img) => img.status === 'success')
+
+    if (uploadedImages.length === 0) {
+      toast.info('アップロード済みの画像がありません')
+      return
+    }
+
+    uploadedImages.forEach((image) => {
+      const metadata = []
+      if (image.width && image.height) {
+        metadata.push(`${image.width} × ${image.height}px`)
+      }
+      metadata.push(formatFileSize(image.file.size))
+
+      toast.success('画像を送信しました', {
+        description: (
+          <div className="space-y-1">
+            <p className="font-medium">{image.file.name}</p>
+            <p className="text-xs text-muted-foreground">
+              {metadata.join(' • ')}
+            </p>
+          </div>
+        ),
+      })
+    })
+  }, [images])
+
   const currentLength = value.length
   const canAddMore = images.length < imageConfig.maxFiles
   const isUploading = images.some((img) => img.status === 'uploading')
+  const [isFocused, setIsFocused] = React.useState(false)
+
+  const handleFocus = React.useCallback(() => {
+    setIsFocused(true)
+  }, [])
+
+  const handleBlur = React.useCallback(() => {
+    setIsFocused(false)
+  }, [])
 
   return (
     <div className={cn('space-y-3', className)}>
-      <div onDragOver={handleDragOver} onDrop={handleDrop} className="relative">
-        <div className="relative">
-          <Textarea
-            ref={textareaRef}
-            value={value}
-            onChange={handleTextareaChange}
-            placeholder={placeholder}
-            maxLength={maxLength}
-            disabled={disabled}
-            className="pr-20"
-          />
-          <div className="absolute bottom-2 right-2 flex items-center gap-2">
+      <div
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        className={cn(
+          'rounded-md border bg-transparent dark:bg-input/30 shadow-xs overflow-hidden transition-[border-color,box-shadow]',
+          isFocused ? 'border-ring ring-ring/50 ring-[3px]' : 'border-input',
+        )}
+      >
+        <Textarea
+          ref={textareaRef}
+          value={value}
+          onChange={handleTextareaChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          placeholder={placeholder}
+          maxLength={maxLength}
+          disabled={disabled}
+          className="border-0 rounded-none rounded-t-md shadow-none bg-transparent dark:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+        />
+        <div className="flex items-center justify-between gap-2 px-2.5 py-2 border-t border-border/50 bg-transparent dark:bg-transparent">
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              size="icon-sm"
+              variant="ghost"
+              onClick={handleImageButtonClick}
+              disabled={disabled || !canAddMore || isUploading}
+              className="h-7 w-7"
+              aria-label="画像を追加"
+            >
+              <ImageIcon className="size-4" />
+            </Button>
+          </div>
+          <div className="flex items-center gap-2">
             {maxLength !== undefined && (
               <span
                 className={cn(
@@ -330,13 +391,13 @@ export function TextareaWithImageUploader({
             <Button
               type="button"
               size="icon-sm"
-              variant="ghost"
-              onClick={handleImageButtonClick}
-              disabled={disabled || !canAddMore || isUploading}
+              variant="default"
+              onClick={handleSubmit}
+              disabled={disabled || isUploading}
               className="h-7 w-7"
-              aria-label="画像を追加"
+              aria-label="送信"
             >
-              <ImageIcon className="size-4" />
+              <Send className="size-4" />
             </Button>
           </div>
         </div>
