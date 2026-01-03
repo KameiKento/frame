@@ -108,6 +108,11 @@ export const navigation: Array<NavGroup> = [
         url: '/components/textarea',
         icon: FileTextIcon,
       },
+      {
+        title: 'TextareaWithImageUploader',
+        url: '/components/textarea-with-image-uploader',
+        icon: ImageIcon,
+      },
     ],
   },
   {
