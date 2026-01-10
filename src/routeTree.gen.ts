@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ComponentsTextareaWithImageUploaderRouteImport } from './routes/components/textarea-with-image-uploader'
 import { Route as ComponentsImageUploaderRouteImport } from './routes/components/image-uploader'
 import { Route as ComponentsButtonRouteImport } from './routes/components/button'
 
@@ -18,6 +19,12 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsTextareaWithImageUploaderRoute =
+  ComponentsTextareaWithImageUploaderRouteImport.update({
+    id: '/components/textarea-with-image-uploader',
+    path: '/components/textarea-with-image-uploader',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ComponentsImageUploaderRoute = ComponentsImageUploaderRouteImport.update({
   id: '/components/image-uploader',
   path: '/components/image-uploader',
@@ -33,30 +40,47 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/image-uploader': typeof ComponentsImageUploaderRoute
+  '/components/textarea-with-image-uploader': typeof ComponentsTextareaWithImageUploaderRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/image-uploader': typeof ComponentsImageUploaderRoute
+  '/components/textarea-with-image-uploader': typeof ComponentsTextareaWithImageUploaderRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/image-uploader': typeof ComponentsImageUploaderRoute
+  '/components/textarea-with-image-uploader': typeof ComponentsTextareaWithImageUploaderRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/components/button' | '/components/image-uploader'
+  fullPaths:
+    | '/'
+    | '/components/button'
+    | '/components/image-uploader'
+    | '/components/textarea-with-image-uploader'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/components/button' | '/components/image-uploader'
-  id: '__root__' | '/' | '/components/button' | '/components/image-uploader'
+  to:
+    | '/'
+    | '/components/button'
+    | '/components/image-uploader'
+    | '/components/textarea-with-image-uploader'
+  id:
+    | '__root__'
+    | '/'
+    | '/components/button'
+    | '/components/image-uploader'
+    | '/components/textarea-with-image-uploader'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComponentsButtonRoute: typeof ComponentsButtonRoute
   ComponentsImageUploaderRoute: typeof ComponentsImageUploaderRoute
+  ComponentsTextareaWithImageUploaderRoute: typeof ComponentsTextareaWithImageUploaderRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -66,6 +90,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/textarea-with-image-uploader': {
+      id: '/components/textarea-with-image-uploader'
+      path: '/components/textarea-with-image-uploader'
+      fullPath: '/components/textarea-with-image-uploader'
+      preLoaderRoute: typeof ComponentsTextareaWithImageUploaderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/image-uploader': {
@@ -89,6 +120,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComponentsButtonRoute: ComponentsButtonRoute,
   ComponentsImageUploaderRoute: ComponentsImageUploaderRoute,
+  ComponentsTextareaWithImageUploaderRoute:
+    ComponentsTextareaWithImageUploaderRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
